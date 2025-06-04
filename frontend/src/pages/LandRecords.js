@@ -77,6 +77,12 @@ const LandRecords = () => {
     coOwners: "",
     thramNumber: "", // Add thram number to registration form
   });
+  // Add a new state for the id (CID) input and fetched land
+  const [searchId, setSearchId] = useState("");
+  const [searchedLand, setSearchedLand] = useState(null);
+  const [searchError, setSearchError] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+
   useEffect(() => {
     const fetchLands = async () => {
       try {
@@ -194,21 +200,6 @@ const LandRecords = () => {
     setEditFormData({ ...editFormData, [id]: value });
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentLands = Array.isArray(lands)
-    ? lands.slice(indexOfFirstItem, indexOfLastItem)
-    : [];
-  const totalPages = Array.isArray(lands)
-    ? Math.ceil(lands.length / itemsPerPage)
-    : 0;
-
-  const handlePageChange = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
@@ -252,40 +243,26 @@ const LandRecords = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await registerLand({
-        ...formData,
-        ownerName: formData.ownerName, // ensure ownerName is sent
-        thramNumber: formData.thramNumber, // ensure thramNumber is sent
-      });
-      console.log("Land registered successfully:", result);
+      // Only send the fields required by the chaincode: id, location, size, price
+      const payload = {
+        id: formData.id,
+        location: formData.location,
+        size: formData.size,
+        price: Number(formData.price),
+      };
+      const result = await registerLand(payload);
       Swal.fire({
         icon: "success",
         title: "Success!",
         text: result.message || "Land registered successfully!",
         confirmButtonColor: "#142854",
       });
-
       setRegistrationSuccess(result.message || "Land registered successfully!");
       setRegistrationError(null);
-
-      setFormData({
-        landType: "",
-        location: "",
-        landSize: "",
-        boundaryDetails: "",
-        ownerName: "",
-        cid: "",
-        contactNumber: "",
-        emailAddress: "",
-        ownershipType: "",
-        coOwners: "",
-        thramNumber: "",
-      });
-
+      setFormData({ id: "", location: "", size: "", price: "" });
       toggleModal();
     } catch (error) {
       console.error("Error submitting land registration:", error);
-
       Swal.fire({
         icon: "error",
         title: "Registration Failed",
@@ -295,11 +272,8 @@ const LandRecords = () => {
           "Land registration failed",
         confirmButtonColor: "#003366",
       });
-
       setRegistrationError(
-        error.response?.data?.message ||
-          error.message ||
-          "Land registration failed"
+        error.response?.data?.message || error.message || "Land registration failed"
       );
       setRegistrationSuccess(null);
     }
@@ -332,7 +306,27 @@ const LandRecords = () => {
     }
   };
 
-  console.log("Current Lands for Table:", currentLands); // Debug log for currentLands
+  // Add a function to handle search by id (CID)
+  const handleSearchById = async () => {
+    setSearchError(null);
+    setSearchedLand(null);
+    if (!searchId.trim()) {
+      setSearchError("Please enter a CID Number.");
+      return;
+    }
+    setSearchLoading(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${apiUrl}/lands/${searchId}`);
+      if (!res.ok) throw new Error("Land not found");
+      const data = await res.json();
+      setSearchedLand(data);
+    } catch (err) {
+      setSearchError("Land not found for this CID Number.");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -432,17 +426,16 @@ const LandRecords = () => {
                 New Land Registration
               </h2>
               <form onSubmit={handleSubmit}>
-                {/* Land Details */}
                 <div className="mb-6 p-4 border rounded-lg shadow-sm">
                   <h3 className="text-xl font-semibold mb-4">Land Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <input
                       type="text"
-                      id="landType"
-                      value={formData.landType}
-                      onChange={handleInputChange}
+                      id="id"
+                      value={formData.id || formData.cid}
+                      onChange={e => setFormData({ ...formData, id: e.target.value, cid: e.target.value })}
                       className="w-full p-2 border rounded"
-                      placeholder="Land Type"
+                      placeholder="CID Number"
                       required
                     />
                     <input
@@ -456,94 +449,24 @@ const LandRecords = () => {
                     />
                     <input
                       type="text"
-                      id="landSize"
-                      value={formData.landSize}
+                      id="size"
+                      value={formData.size}
                       onChange={handleInputChange}
                       className="w-full p-2 border rounded"
-                      placeholder="Land Size"
-                      required
-                    />
-                    <textarea
-                      id="boundaryDetails"
-                      value={formData.boundaryDetails}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      placeholder="Boundary Details"
-                      required
-                    ></textarea>
-                  </div>
-                </div>
-
-                {/* Owner Details */}
-                <div className="mb-6 p-4 border rounded-lg shadow-sm">
-                  <h3 className="text-xl font-semibold mb-4">Owner Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <input
-                      type="text"
-                      id="ownerName"
-                      value={formData.ownerName}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      placeholder="Owner Name"
+                      placeholder="Size"
                       required
                     />
                     <input
                       type="text"
-                      id="cid"
-                      value={formData.cid}
+                      id="price"
+                      value={formData.price}
                       onChange={handleInputChange}
                       className="w-full p-2 border rounded"
-                      placeholder="CID Number"
-                      required
-                    />
-                    <input
-                      type="text"
-                      id="contactNumber"
-                      value={formData.contactNumber}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      placeholder="Contact Number"
-                      required
-                    />
-                    <input
-                      type="email"
-                      id="emailAddress"
-                      value={formData.emailAddress}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      placeholder="Email Address"
-                      required
-                    />
-                    <input
-                      type="text"
-                      id="ownershipType"
-                      value={formData.ownershipType}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      placeholder="Ownership Type"
-                      required
-                    />
-                    <input
-                      type="text"
-                      id="coOwners"
-                      value={formData.coOwners}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      placeholder="Co-Owners (if any)"
-                    />
-                    <input
-                      type="text"
-                      id="thramNumber"
-                      value={formData.thramNumber}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      placeholder="Thram Number (e.g., 179)"
+                      placeholder="Price"
                       required
                     />
                   </div>
                 </div>
-
-                {/* Submit & Cancel */}
                 <div className="flex justify-end gap-4 mt-4">
                   <button
                     type="button"
@@ -566,109 +489,36 @@ const LandRecords = () => {
 
         {/* Land Records Table */}
         <div className="bg-white shadow-md rounded-lg p-6 overflow-x-auto">
-          <div className="flex justify-between items-center w-full">
-            <h2 className="font-semibold text-lg mb-4">Land Records</h2>
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row justify-between items-center w-full mb-4 gap-4">
+            <h2 className="font-semibold text-lg">Land Records</h2>
+            <div className="flex gap-2 items-center">
               <input
                 type="text"
-                placeholder="Search"
-                className="peer px-3 py-2 border rounded-lg pl-8 w-full sm:w-64 text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#003366]"
+                value={searchId}
+                onChange={e => setSearchId(e.target.value)}
+                placeholder="Enter CID Number"
+                className="px-3 py-2 border rounded-lg w-48 text-sm focus:outline-none focus:ring-2 focus:ring-[#003366]"
               />
-              <FiSearch className="absolute left-2 top-2.5 text-gray-500 peer-focus:left-2.5 transition-all duration-300" />
-            </div>
-          </div>
-          <table className="mt-3 w-full border-collapse border border-gray-200">
-            <thead>
-              <tr className="bg-gray-100 text-gray-700 uppercase text-sm font-semibold">
-                <th className="border p-2 text-left">Land ID</th>
-                <th className="border p-2 text-left">Owner</th>
-                <th className="border p-2 text-left">Location</th>
-                <th className="border p-2 text-left">Thram Number</th>
-                <th className="border p-2 text-left">Date</th>
-                <th className="border p-2 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentLands.length > 0 ? (
-                currentLands.map((land) => (
-                  <tr
-                    key={land.id}
-                    className="text-center hover:bg-gray-50 transition-colors duration-150"
-                  >
-                    <td className="border p-2 text-sm">{land.id}</td>
-                    <td className="border p-2 text-sm text-left">
-                      {land.owner}
-                    </td>
-                    <td className="border p-2 text-sm text-left">
-                      {land.location}
-                    </td>
-                    <td className="border p-2 text-sm">
-                      {land.thramNumber || "N/A"}
-                    </td>
-                    <td className="border p-2 text-sm text-left">
-                      {land.registrationDate
-                        ? new Date(land.registrationDate).toLocaleDateString()
-                        : land.date
-                        ? new Date(land.date).toLocaleDateString()
-                        : "N/A"}
-                    </td>
-                    <td className="border p-2 text-center">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          className="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-2 rounded text-xs"
-                          onClick={() => handleViewLand(land)}
-                        >
-                          View
-                        </button>
-                        <button
-                          className="bg-[#003366] hover:bg-[#002952] text-white font-bold py-1 px-2 rounded text-xs"
-                          onClick={() => handleEditLand(land)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs"
-                          onClick={() => handleDeleteLand(land.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center p-2">
-                    No lands available.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          {/* Pagination */}
-          <div className="flex justify-between items-center mt-4">
-            <span className="text-sm text-gray-700">
-              Showing {indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, lands.length)} of {lands.length}{" "}
-              entries
-            </span>
-            <div className="flex gap-2">
               <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="bg-gray-200 text-gray-700 px-4 py-0 rounded-md hover:bg-gray-300 focus:outline-none  disabled:opacity-50 transition-colors duration-150"
+                onClick={handleSearchById}
+                className="bg-[#003366] text-white px-4 py-2 rounded-lg text-sm"
+                disabled={searchLoading}
               >
-                Prev
-              </button>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="bg-[#142854] text-white px-4 py-0 rounded-md hover:bg-[#0f1d2d] focus:outline-none  disabled:opacity-50 transition-colors duration-150"
-              >
-                Next
+                {searchLoading ? "Searching..." : "Search by CID"}
               </button>
             </div>
           </div>
+          {searchError && <div className="text-red-600 mb-2">{searchError}</div>}
+          {searchedLand && (
+            <div className="border rounded p-4 bg-gray-50 mb-4">
+              <h3 className="font-semibold mb-2">Land Details</h3>
+              <div><span className="font-medium">CID:</span> {searchedLand.id}</div>
+              <div><span className="font-medium">Owner:</span> {searchedLand.owner || searchedLand.ownerName}</div>
+              <div><span className="font-medium">Location:</span> {searchedLand.location}</div>
+              <div><span className="font-medium">Size:</span> {searchedLand.landSize || searchedLand.size}</div>
+              <div><span className="font-medium">Price:</span> {searchedLand.price}</div>
+            </div>
+          )}
         </div>
         {isEditModalOpen && selectedLand && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

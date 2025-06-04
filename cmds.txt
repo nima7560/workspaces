@@ -1,0 +1,47 @@
+docker network create --driver=bridge --subnet=10.50.0.0/16 --gateway=10.50.0.1 teraconsortium-network
+
+export PATH=$PATH:/workspaces/bin
+
+cryptogen generate --config=./crypto-config.yaml --output=crypto-config
+
+configtxgen -outputBlock ./orderer/teraconsortiumgenesis.block -channelID ordererchannel -profile TeraConsortiumGenesis
+
+configtxgen -outputCreateChannelTx ./teraconsortiumchannel/teraconsortiumchannel.tx -channelID teraconsortiumchannel  -profile TeraConsortiumChannel
+
+. ./set_govt.sh 
+
+peer channel create -c teraconsortiumchannel -f ./config/teraconsortiumchannel/teraconsortiumchannel.tx --outputBlock ./config/teraconsortiumchannel/teraconsortiumchannel.block -o $ORDERER_ADDRESS
+
+peer channel join -b ./config/teraconsortiumchannel/teraconsortiumchannel.block -o $ORDERER_ADDRESS
+
+
+
+
+
+peer lifecycle chaincode package  $CC_PACKAGE_FILE -p $CC_PATH --label $CC_LABEL
+
+peer lifecycle chaincode install  $CC_PACKAGE_FILE 
+
+peer lifecycle chaincode queryinstalled
+
+peer lifecycle chaincode approveformyorg -n tera-landregistry -v 1.0 -C  teraconsortiumchannel --sequence 1 --package-id $CC_PACKAGE_ID
+
+peer lifecycle chaincode checkcommitreadiness -n tera-landregistry -v 1.0 -C teraconsortiumchannel --sequence 1
+
+peer lifecycle chaincode commit -n tera-landregistry -v 1.0 -C teraconsortiumchannel --sequence 1
+
+peer lifecycle chaincode querycommitted -n tera-landregistry -C teraconsortiumchannel
+
+peer chaincode invoke -C teraconsortiumchannel -n tera-landregistry -c '{"function":"ListLand","Args":["land1","Thimphu","500 sqft","1000000"]}'
+
+peer chaincode query -C teraconsortiumchannel -n tera-landregistry -c '{"function":"ReadLand","Args":["land1"]}'
+
+peer chaincode invoke -C teraconsortiumchannel -n tera-landregistry -c '{"function":"SellLand","Args":["land1", "55000"]}'
+
+peer chaincode invoke -C teraconsortiumchannel -n tera-landregistry -c '{"function":"BuyLand","Args":["land1"]}'
+
+peer chaincode invoke -C teraconsortiumchannel -n tera-landregistry -c '{"function":"TransferLandOwnership","Args":["land1", "newOwnerID"]}'
+
+peer chaincode query -C teraconsortiumchannel -n tera-landregistry -c '{"function":"LandExists","Args":["land1"]}'
+
+peer chaincode query -C teraconsortiumchannel -n tera-landregistry -c '{"function":"GetClientID","Args":[]}'

@@ -1,0 +1,56 @@
+{
+  "name": "TeraConsortium",
+  "version": "1.0.0",
+  "channels": {
+    "teraconsortiumchannel": {
+      "orderers": ["orderer.tera.bt"],
+      "peers": {
+        "teraconsortium-govt": {},
+        "teraconsortium-buyers": {},
+        "teraconsortium-sellers": {}
+      }
+    }
+  },
+  "organizations": {
+    "Govt": {
+      "mspid": "GovtMSP",
+      "peers": ["teraconsortium-govt"]
+    },
+    "Buyers": {
+      "mspid": "BuyersMSP",
+      "peers": ["teraconsortium-buyers"]
+    },
+    "Sellers": {
+      "mspid": "SellersMSP",
+      "peers": ["teraconsortium-sellers"]
+    }
+  },
+  "orderers": {
+    "orderer.tera.bt": {
+      "url": "grpc://orderer.tera.bt:7050",
+      "grpcOptions": {
+        "ssl-target-name-override": "orderer.tera.bt"
+      }
+    }
+  },
+  "peers": {
+    "teraconsortium-govt": {
+      "url": "grpc://teraconsortium-govt:7051",
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.govt.tera.bt"
+      }
+    },
+    "teraconsortium-buyers": {
+      "url": "grpc://teraconsortium-buyers:7051",
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.buyers.tera.bt"
+      }
+    },
+    "teraconsortium-sellers": {
+      "url": "grpc://teraconsortium-sellers:7051",
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.sellers.tera.bt"
+      }
+    }
+  }
+}

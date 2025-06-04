@@ -1,0 +1,67 @@
+General:
+    BootstrapMethod: file
+    # BootstrapMethod: none
+    BootstrapFile: /var/hyperledger/config/teraconsortiumgenesis.block
+    BCCSP:
+        Default: SW
+        SW:
+            HASH: SHA2
+            Security: 256
+            FileKeyStore:
+                Keystore:
+    LocalMSPDir: /var/hyperledger/msp
+    LocalMSPID: OrdererMSP
+    ListenAddress: 0.0.0.0
+    ListenPort: 7050
+    Cluster:
+        SendBufferSize: 10
+        ClientCertificate:
+        ClientPrivateKey:
+        ListenPort:
+        ListenAddress:
+        ServerCertificate:
+        ServerPrivateKey:
+    Keepalive:
+        ServerMinInterval: 60s
+        ServerInterval: 7200s
+        ServerTimeout: 20s
+    TLS:
+        Enabled: false
+        PrivateKey: /var/hyperledger/tls/server.key
+        Certificate: /var/hyperledger/tls/server.crt
+        # PrivateKey: ./server.key
+        # Certificate: ./server.crt
+        RootCAs:
+          - /var/hyperledger/tls/ca.crt
+        #   - ./ca.crt
+        ClientAuthRequired: false
+        ClientRootCAs:
+
+FileLedger:
+    Location: /var/ledger
+    Prefix: hyperledger-fabric-ordererledger    
+
+Debug:
+    BroadcastTraceDir: 
+    DeliverTraceDir:
+
+Operations:
+    ListenAddress: 127.0.0.1:8443
+    TLS:
+        Enabled: false
+        Certificate:
+        PrivateKey:
+        ClientAuthRequired: false
+        RootCAs: []
+
+Metrics:
+    Provider: disabled
+    Statsd:
+      Network: udp
+      Address: 127.0.0.1:8125
+      WriteInterval: 30s
+      Prefix:
+
+Consensus:
+    WALDir: /var/hyperledger/production/orderer/etcdraft/wal
+    SnapDir: /var/hyperledger/production/orderer/etcdraft/snapshot

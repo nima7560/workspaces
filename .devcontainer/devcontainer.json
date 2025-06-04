@@ -1,0 +1,10 @@
+{
+  "name": "TeraProjectConsortium",
+  "dockerComposeFile": ["docker-compose-unicsrt.yml"],
+  "service": "tera-development",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    // This enables you to docker cli command in the development container
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  }
+}

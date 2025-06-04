@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <title>TeraLand Registry</title>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="navbar bg-light">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">TeraLand Registry</span>
+      </div>
+    </nav>
+    <hr>
+    <div class="row">
+      <!-- Current User Selector -->
+      <div class="col-12">
+        <div class="mb-3">
+          <label for="currentUser" class="form-label">Current User</label>
+          <select class="form-select" id="currentUser">
+            <option value="User1@govt.tera.bt">User1@govt.tera.bt</option>
+            <option value="User1@buyers.tera.bt">User1@buyers.tera.bt</option>
+            <option value="User1@sellers.tera.bt">User1@sellers.tera.bt</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <!-- Land Listing Form -->
+      <div class="col-sm-6">
+        <div class="card">
+          <div class="card-header">List New Land</div>
+          <div class="card-body">
+            <form id="listLandForm">
+              <div class="mb-3">
+                <label for="landId" class="form-label">Land ID</label>
+                <input type="text" class="form-control" id="landId">
+              </div>
+              <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="location">
+              </div>
+              <div class="mb-3">
+                <label for="size" class="form-label">Size (sq ft)</label>
+                <input type="number" class="form-control" id="size">
+              </div>
+              <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input type="number" class="form-control" id="price">
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Land Details -->
+      <div class="col-sm-6">
+        <div class="card">
+          <div class="card-header">Land Information</div>
+          <div class="card-body">
+            <form id="getLandForm">
+              <div class="mb-3">
+                <label for="searchLandId" class="form-label">Land ID</label>
+                <input type="text" class="form-control" id="searchLandId">
+              </div>
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+
+            <form id="editLandForm" class="d-none">
+              <label id="editLandId" class="form-label">ID:</label>
+              <div class="mb-3">
+                <label for="editPrice" class="form-label">Price</label>
+                <input type="number" class="form-control" id="editPrice">
+              </div>
+              <div class="mb-3">
+                <label for="editOwner" class="form-label">New Owner</label>
+                <input type="text" class="form-control" id="editOwner">
+              </div>
+              <button type="button" id="sellButton" class="btn btn-warning">Sell</button>
+              <button type="button" id="transferButton" class="btn btn-info">Transfer</button>
+              <button type="button" id="deleteButton" class="btn btn-danger">Delete</button>
+              <button type="button" id="buyButton" class="btn btn-success d-none">Buy</button>
+            </form>
+          </div>
+          <div class="card-footer">
+            <label class="text-danger" id="message"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <!-- Success Modal -->
+    <div class="modal" tabindex="-1" role="dialog" id="successModal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Success</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Transaction completed successfully.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">Are you sure?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="noButton">No</button>
+            <button type="button" class="btn btn-primary" id="yesButton">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="index_html.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+networks:
+  teraconsortium-network:
+    external: true  # Storage outside the containers
+
+volumes:
+  data-orderer.tera.bt:
+  data-teraconsortium-govt:
+  data-teraconsortium-buyers:
+  data-teraconsortium-sellers:
+services:
+  tera-development:
+    container_name: teraconsortium-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: |
+      sleep infinity
+    stop_grace_period: 5s
+    volumes:
+      - ../:/workspaces:cached
+    networks:
+      - teraconsortium-network
+
+  orderer.tera.bt:
+    container_name: orderer.tera.bt
+    image: hyperledger/fabric-orderer:$IMAGE_TAG
+    command: orderer
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=ERROR
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+    volumes:
+      - ${PWD}/config/orderer:/var/hyperledger/config
+      - ${PWD}/config/crypto-config/ordererOrganizations/tera.bt/orderers/orderer.tera.bt/msp:/var/hyperledger/msp
+      - ${PWD}/config/crypto-config/ordererOrganizations/tera.bt/orderers/orderer.tera.bt/tls:/var/hyperledger/tls
+      - data-orderer.tera.bt:/var/ledger
+    ports:
+      - 7050:7050
+      - 8443:8443
+    networks:
+      - teraconsortium-network
+
+  teraconsortium-govt:
+    container_name: teraconsortium-govt
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=WARNING
+      - CORE_PEER_LOCALMSPID=GovtMSP
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=teraconsortium-network
+      - GOPATH=/opt/gopath
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=teraconsortium-govt:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+    command: peer node start
+    volumes:
+      - ${PWD}/config/gov:/var/hyperledger/config
+      - ${PWD}/config/crypto-config/peerOrganizations/govt.tera.bt/peers/gov/msp:/var/hyperledger/msp
+      - ${PWD}/config/crypto-config/peerOrganizations/govt.tera.bt/peers/gov/tls:/var/hyperledger/tls
+      - /var/run/:/var/run/
+      - data-teraconsortium-govt:/var/hyperledger/production
+    depends_on:
+      - orderer.tera.bt
+    ports:
+      - 7051:7051
+      - 7052:7052
+    networks:
+      - teraconsortium-network
+
+  teraconsortium-buyers:
+    container_name: teraconsortium-buyers
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=WARNING
+      - CORE_PEER_LOCALMSPID=BuyersMSP
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=teraconsortium-network
+      - GOPATH=/opt/gopath
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=teraconsortium-buyers:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+    command: peer node start
+    volumes:
+      - ${PWD}/config/buyer:/var/hyperledger/config
+      - ${PWD}/config/crypto-config/peerOrganizations/buyers.tera.bt/peers/buyer/msp:/var/hyperledger/msp
+      - ${PWD}/config/crypto-config/peerOrganizations/buyers.tera.bt/peers/buyer/tls:/var/hyperledger/tls
+      - /var/run/:/var/run/
+      - data-teraconsortium-buyers:/var/hyperledger/production
+    depends_on:
+      - orderer.tera.bt
+    ports:
+      - 8051:7051
+      - 8052:7052
+    networks:
+      - teraconsortium-network
+
+  teraconsortium-sellers:
+    container_name: teraconsortium-sellers
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+    environment:
+      - FABRIC_CFG_PATH=/var/hyperledger/config
+      - FABRIC_LOGGING_SPEC=WARNING
+      - CORE_PEER_LOCALMSPID=SellersMSP
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=teraconsortium-network
+      - GOPATH=/opt/gopath
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=teraconsortium-sellers:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+    command: peer node start
+    volumes:
+      - ${PWD}/config/seller:/var/hyperledger/config
+      - ${PWD}/config/crypto-config/peerOrganizations/sellers.tera.bt/peers/seller/msp:/var/hyperledger/msp
+      - ${PWD}/config/crypto-config/peerOrganizations/sellers.tera.bt/peers/seller/tls:/var/hyperledger/tls
+      - /var/run/:/var/run/
+      - data-teraconsortium-sellers:/var/hyperledger/production
+    depends_on:
+      - orderer.tera.bt
+    ports:
+      - 9051:7051
+      - 9052:7052
+    networks:
+      - teraconsortium-network

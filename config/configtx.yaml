@@ -1,0 +1,200 @@
+# CAPABILITIES
+Capabilities:
+  Application: &ApplicationCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Channel: &ChannelCapabilities
+    V2_0: true
+
+# ORGANIZATIONS
+Organizations:
+  - &Orderer
+    Name: Orderer
+    ID: OrdererMSP
+    MSPDir: ./crypto-config/ordererOrganizations/tera.bt/msp
+    Policies: &OrdererPolicies
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+
+  - &Govt
+    Name: Govt
+    ID: GovtMSP
+    MSPDir: ./crypto-config/peerOrganizations/govt.tera.bt/msp
+    Policies: &GovtPolicies
+      Readers:
+        Type: Signature
+        Rule: "OR('GovtMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('GovtMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('GovtMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('GovtMSP.member')"
+    AnchorPeers:
+      - Host: gov
+        Port: 7051
+
+  - &Buyers
+    Name: Buyers
+    ID: BuyersMSP
+    MSPDir: ./crypto-config/peerOrganizations/buyers.tera.bt/msp
+    Policies: &BuyersPolicies
+      Readers:
+        Type: Signature
+        Rule: "OR('BuyersMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('BuyersMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('BuyersMSP.member')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('BuyersMSP.member')"
+    AnchorPeers:
+      - Host: buyer
+        Port: 7051
+
+  - &Sellers
+    Name: Sellers
+    ID: SellersMSP
+    MSPDir: ./crypto-config/peerOrganizations/sellers.tera.bt/msp
+    Policies: &SellersPolicies
+      Readers:
+        Type: Signature
+        Rule: "OR('SellersMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('SellersMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('SellersMSP.member')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('SellersMSP.member')"
+    AnchorPeers:
+      - Host: seller
+        Port: 7051
+
+# ORDERER
+Orderer: &OrdererDefaults
+  OrdererType: solo
+  Addresses:
+    - orderer.tera.bt:7050
+
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 98 MB
+    PreferredMaxBytes: 512 KB
+  Capabilities:
+    <<: *OrdererCapabilities
+
+# APPLICATION
+Application: &ApplicationDefaults
+  ACLs: &ACLsDefault
+    lscc/ChaincodeExists: /Channel/Application/Readers
+    lscc/GetDeploymentSpec: /Channel/Application/Readers
+    lscc/GetChaincodeData: /Channel/Application/Readers
+    lscc/GetInstantiatedChaincodes: /Channel/Application/Readers
+    qscc/GetChainInfo: /Channel/Application/Readers
+    qscc/GetBlockByNumber: /Channel/Application/Readers
+    qscc/GetBlockByHash: /Channel/Application/Readers
+    qscc/GetTransactionByID: /Channel/Application/Readers
+    qscc/GetBlockByTxID: /Channel/Application/Readers
+    cscc/GetConfigBlock: /Channel/Application/Readers
+    cscc/GetConfigTree: /Channel/Application/Readers
+    cscc/SimulateConfigTreeUpdate: /Channel/Application/Readers
+    peer/Propose: /Channel/Application/Writers
+    peer/ChaincodeToChaincode: /Channel/Application/Readers
+    event/Block: /Channel/Application/Readers
+    event/FilteredBlock: /Channel/Application/Readers
+    _lifecycle/CheckCommitReadiness: /Channel/Application/Writers
+    _lifecycle/CommitChaincodeDefinition: /Channel/Application/Writers
+    _lifecycle/QueryChaincodeDefinition: /Channel/Application/Readers
+  Policies: &ApplicationDefaultPolicies
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "ANY Endorsement"
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "ANY Endorsement"
+  Organizations:
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+# CHANNEL
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+# PROLES
+Profiles:
+  TeraConsortiumGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - <<: *Orderer
+    Consortiums:
+      TeraConsortium:
+        Organizations:
+          - <<: *Govt
+          - <<: *Buyers
+          - <<: *Sellers
+
+  TeraConsortiumChannel:
+    <<: *ChannelDefaults
+    Consortium: TeraConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - <<: *Govt
+        - <<: *Buyers
+        - <<: *Sellers

@@ -1,0 +1,47 @@
+{
+  "name": "test-network",
+  "version": "1.0.0",
+  "client": {
+    "tlsEnable": false,
+    "adminCredential": {
+      "id": "admin",
+      "password": "admin"
+    },
+    "enableAuthentication": false,
+    "organization": "GovtMSP",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        },
+        "orderer": "300"
+      }
+    }
+  },
+  "channels": {
+    "teraconsortiumchannel": {
+      "peers": {
+        "teraconsortium-govt": {}
+      }
+    }
+  },
+  "organizations": {
+    "GovtMSP": {
+      "mspid": "GovtMSP",
+      "adminPrivateKey": {
+        "path": "/tmp/crypto/peerOrganizations/govt.tera.bt/users/Admin@govt.tera.bt/msp/keystore/priv_sk"
+      },
+      "peers": [
+        "teraconsortium-govt"
+      ],
+      "signedCert": {
+        "path": "/tmp/crypto/peerOrganizations/govt.tera.bt/users/Admin@govt.tera.bt/msp/signcerts/Admin@govt.tera.bt-cert.pem"
+      }
+    }
+  },
+  "peers": {
+    "teraconsortium-govt": {
+      "url": "grpc://teraconsortium-govt:7051"
+    }
+  }
+}

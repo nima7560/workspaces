@@ -1,0 +1,32 @@
+##### Orderers
+OrdererOrgs:
+  - Name: Orderer
+    Domain: tera.bt
+    Specs:
+      - Hostname: orderer
+
+#### Peers
+PeerOrgs:
+  - Name: Govt
+    Domain: govt.tera.bt
+    Specs:
+      - Hostname: gov
+        CommonName: gov
+    Users:
+      Count: 1
+
+  - Name: Buyers
+    Domain: buyers.tera.bt
+    Specs:
+      - Hostname: buyer
+        CommonName: buyer
+    Users:
+      Count: 1
+
+  - Name: Sellers
+    Domain: sellers.tera.bt
+    Specs:
+      - Hostname: seller
+        CommonName: seller
+    Users:
+      Count: 1

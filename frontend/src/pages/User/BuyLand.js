@@ -139,12 +139,7 @@ function BuyLand() {
           : Array.isArray(response.data)
           ? response.data
           : [];
-        // Optionally filter out lands owned by the current user
-        const userCid = localStorage.getItem("userCid");
-        const filtered = userCid
-          ? lands.filter((land) => land.cid !== userCid)
-          : lands;
-        setAllTransactions(filtered);
+        setAllTransactions(lands);
       } catch (error) {
         console.error("Failed to fetch lands for sale", error);
       }
@@ -166,7 +161,7 @@ function BuyLand() {
   // Handler for buying land
   const handleBuyLand = async () => {
     if (!landIdToBuy) {
-      setBuyStatus("Please enter a Land ID (CID) to buy.");
+      setBuyStatus("Please enter a Land ID to buy.");
       return;
     }
     setBuyStatus("Processing...");
@@ -664,7 +659,7 @@ function BuyLand() {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-center items-center mt-6 space-x-2">
+        {/* <div className="flex justify-center items-center mt-6 space-x-2">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -692,18 +687,18 @@ function BuyLand() {
           >
             Next
           </button>
-        </div>
+        </div> */}
 
         {/* Buy Land by Land ID (CID) */}
         <div className="bg-white p-4 rounded shadow mb-6 max-w-md mx-auto">
           <h2 className="text-lg font-semibold mb-2">
-            Buy Land by Land ID (CID)
+            Buy Land by Land ID
           </h2>
           <div className="flex gap-2 mb-2">
             <input
               type="text"
               className="border rounded px-3 py-2 flex-1"
-              placeholder="Enter Land ID (CID)"
+              placeholder="Enter Land ID"
               value={landIdToBuy}
               onChange={(e) => setLandIdToBuy(e.target.value)}
             />

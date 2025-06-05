@@ -1,6 +1,6 @@
 import Sidebar from "./SidebarNavigation";
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
 import LandRecords from "../pages/LandRecords";
@@ -50,17 +50,6 @@ const Layout = ({ children }) => {
     setUserCid(storedCid);
   }, []);
 
-  // Use userRole for role checks
-  const isAdmin = userRole === "admin";
-  const isUser = userRole === "user";
-
-  useEffect(() => {
-    // Redirect users away from /land-disputes if not admin
-    if (location.pathname === "/land-disputes" && !isAdmin) {
-      navigate("/dashboard");
-    }
-  }, [location, isAdmin, navigate]);
-
   return (
     <div className="h-screen overflow-hidden flex">
       {/* Sidebar */}
@@ -101,37 +90,17 @@ const Layout = ({ children }) => {
           <div className="content-body h-full overflow-auto">
             <div>
               <Routes>
-                {isAdmin && <Route path="/dashboard" element={<Dashboard />} />}
-                {isAdmin && (
-                  <Route path="/transactions" element={<Transaction />} />
-                )}
-                {isAdmin && (
-                  <Route path="/land-records" element={<LandRecords />} />
-                )}
-                {isAdmin && (
-                  <Route path="/land-disputes" element={<LandDisputes />} />
-                )}
-                {isAdmin && (
-                  <Route
-                    path="/verify-ownership"
-                    element={<VerifyOwnership />}
-                  />
-                )}
-                {isUser && <Route path="/dashboard" element={<Home />} />}
-                {isUser && <Route path="/buy-land" element={<BuyLand />} />}
-                {isUser && <Route path="/sell-land" element={<SellLand />} />}
-                {isUser && (
-                  <Route
-                    path="/transfer-ownership"
-                    element={<TransferOwnership />}
-                  />
-                )}
-                {isUser && (
-                  <Route path="/Dispute-Land" element={<DisputeLand />} />
-                )}
-                {isUser && (
-                  <Route path="/user-profile" element={<UserProfile />} />
-                )}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/transactions" element={<Transaction />} />
+                <Route path="/land-records" element={<LandRecords />} />
+                <Route path="/land-disputes" element={<LandDisputes />} />
+                <Route path="/verify-ownership" element={<VerifyOwnership />} />
+                <Route path="/buy-land" element={<BuyLand />} />
+                <Route path="/sell-land" element={<SellLand />} />
+                <Route path="/transfer-ownership" element={<TransferOwnership />} />
+                <Route path="/Dispute-Land" element={<DisputeLand />} />
+                <Route path="/user-profile" element={<UserProfile />} />
+                {/* Add other shared routes as needed */}
               </Routes>
             </div>
           </div>

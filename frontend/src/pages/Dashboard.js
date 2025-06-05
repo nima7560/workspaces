@@ -45,47 +45,30 @@ const Dashboard = () => {
   const [pendingTransactions, setPendingTransactions] = useState(0);
   const itemsPerPage = 5;
 
-  // Get user CID and role from localStorage (set at login)
-  const userCid = localStorage.getItem("userCid");
-  const userRole = localStorage.getItem("userRole");
-
   useEffect(() => {
-    // Fetch all land records for admin, or user-specific for users
+    // Fetch all land records for all users
     const fetchLands = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/api/govtland/land-records"
         );
         let allLands = response.data.data || response.data || [];
-        if (userRole === "admin") {
-          setRegisteredLands(allLands.length); // Show total for admin
-        } else if (userRole === "user" && userCid) {
-          const userLands = allLands.filter((land) => land.cid === userCid);
-          setRegisteredLands(userLands.length); // Show user count for user
-        } else {
-          setRegisteredLands(0);
-        }
+        setRegisteredLands(allLands.length);
       } catch (error) {
         setRegisteredLands(0);
       }
     };
     fetchLands();
-  }, [userCid, userRole]);
+  }, []);
 
   useEffect(() => {
-    // Fetch transactions for this user
+    // Fetch all transactions for all users
     const fetchTransactions = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/api/transactions"
         );
         let txns = response.data.data || response.data || [];
-        // Filter by user CID only (remove userEmail logic)
-        if (userRole === "user" && userCid) {
-          txns = txns.filter(
-            (t) => t.buyerInfo?.id === userCid || t.sellerInfo?.id === userCid
-          );
-        }
         setAllTransactions(txns);
         setApprovedTransactions(
           txns.filter((t) => t.status?.toLowerCase() === "approved").length
@@ -104,29 +87,7 @@ const Dashboard = () => {
       }
     };
     fetchTransactions();
-  }, [userCid, userRole]);
-
-  // Fetch the user's land count from the blockchain using their CID (id)
-  useEffect(() => {
-    const fetchUserLandCount = async () => {
-      try {
-        // Always read the latest CID from localStorage
-        const cid = localStorage.getItem("userCid") || "11309001854";
-        const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-        // Fetch land by CID (id)
-        const res = await fetch(`${apiUrl}/lands/${cid}`);
-        if (!res.ok) throw new Error("No land found for this CID");
-        const land = await res.json();
-        // If a land is found, set count to 1, else 0
-        setRegisteredLands(land && land.id ? 1 : 0);
-      } catch (error) {
-        setRegisteredLands(0);
-      }
-    };
-    if (userRole === "user") {
-      fetchUserLandCount();
-    }
-  }, [userRole]);
+  }, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

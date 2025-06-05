@@ -27,8 +27,7 @@ function TransferOwnership() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    newOwnerHash,
-                    ownerIdentity
+                    newOwner: newOwnerHash
                 })
             });
             if (response.ok) {

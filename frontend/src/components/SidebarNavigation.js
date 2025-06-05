@@ -3,11 +3,9 @@ import {
   MdDashboard,
   MdOutlineTransferWithinAStation,
   MdOutlineHome,
-  MdOutlineGavel,
   MdShoppingCart,
   MdAttachMoney,
   MdCompareArrows,
-  MdGavel,
 } from "react-icons/md";
 import logo from "../assets/images/logo.png";
 import { useState, useEffect } from "react";
@@ -115,36 +113,7 @@ const Sidebar = () => {
     setUserRole(storedRole);
   }, []);
 
-  useEffect(() => {
-    if (userRole) {
-      if (userRole === "admin") {
-        setActiveSidebarItem(1); // Admin: Dashboard
-      } else {
-        setActiveSidebarItem(6); // User: Dashboard
-      }
-    }
-  }, [userRole]);
-
-  const isAdmin = userRole === "admin";
-
-  // Fetch all transactions from the backend (with fallback to empty array)
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        // Use the correct backend URL for your dev environment
-        const response = await axios.get(
-          "http://localhost:5000/api/transactions"
-        );
-        // If your backend returns { data: [...] }
-        setAllTransactions(response.data.data || response.data || []);
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-        setAllTransactions([]);
-      }
-    };
-    fetchTransactions();
-  }, []);
-
+  // Remove all role logic, always show the same sidebar for everyone
   return (
     <div
       className={`bg-gradient-to-b from-[#67492b] to-[#f3bd85] text-white sticky top-0 h-screen flex flex-col transition-all duration-300 overflow-hidden ${
@@ -180,96 +149,41 @@ const Sidebar = () => {
       </button>
 
       <ul className="space-y-2 w-full flex flex-col items-center justify-start mt-4">
-        {isAdmin && (
-          <SidebarItem
-            icon={<MdDashboard className="text-xl" />}
-            label="Dashboard"
-            active={activeSidebarItem === 1}
-            onClick={() => handleSidebarItemClick(1, "/dashboard")}
-            showText={showSidebarText}
-          />
-        )}
-        {isAdmin && (
-          <SidebarItem
-            icon={<MdOutlineHome className="text-xl" />}
-            label="Land Records"
-            active={activeSidebarItem === 2}
-            onClick={() => handleSidebarItemClick(2, "/land-records")}
-            showText={showSidebarText}
-          />
-        )}
-        {isAdmin && (
-          <SidebarItem
-            icon={<MdOutlineTransferWithinAStation className="text-xl" />}
-            label="Transactions"
-            active={activeSidebarItem === 3}
-            onClick={() => handleSidebarItemClick(3, "/transactions")}
-            showText={showSidebarText}
-          />
-        )}
-        {isAdmin && (
-          <SidebarItem
-            icon={<MdOutlineGavel className="text-xl" />}
-            label="Land Disputes"
-            active={activeSidebarItem === 4}
-            onClick={() => handleSidebarItemClick(4, "/land-disputes")}
-            showText={showSidebarText}
-          />
-        )}
-        {isAdmin && (
-          <SidebarItem
-            icon={<MdOutlineGavel className="text-xl" />}
-            label="Verify Ownership"
-            active={activeSidebarItem === 5}
-            onClick={() => handleSidebarItemClick(5, "/verify-ownership")}
-            showText={showSidebarText}
-          />
-        )}
-        {!isAdmin && (
-          <SidebarItem
-            icon={<MdDashboard className="text-xl" />}
-            label="Dashboard"
-            active={activeSidebarItem === 6}
-            onClick={() => handleSidebarItemClick(6, "/dashboard")}
-            showText={showSidebarText}
-          />
-        )}
-        {!isAdmin && (
-          <SidebarItem
-            icon={<MdShoppingCart className="text-xl" />}
-            label="Buy Land"
-            active={activeSidebarItem === 7}
-            onClick={() => handleSidebarItemClick(7, "/buy-land")}
-            showText={showSidebarText}
-          />
-        )}
-        {!isAdmin && (
-          <SidebarItem
-            icon={<MdAttachMoney className="text-xl" />}
-            label="Sell Land"
-            active={activeSidebarItem === 8}
-            onClick={() => handleSidebarItemClick(8, "/sell-land")}
-            showText={showSidebarText}
-          />
-        )}
-        {!isAdmin && (
-          <SidebarItem
-            icon={<MdCompareArrows className="text-xl" />}
-            label="Transfer Ownership"
-            active={activeSidebarItem === 9}
-            onClick={() => handleSidebarItemClick(9, "/transfer-ownership")}
-            showText={showSidebarText}
-          />
-        )}
-        {!isAdmin && (
-          <SidebarItem
-            icon={<MdGavel className="text-xl" />}
-            label="Dispute Land"
-            active={activeSidebarItem === 10}
-            onClick={() => handleSidebarItemClick(10, "/dispute-land")}
-            showText={showSidebarText}
-          />
-        )}
+        <SidebarItem
+          icon={<MdDashboard className="text-xl" />}
+          label="Dashboard"
+          active={activeSidebarItem === 1}
+          onClick={() => handleSidebarItemClick(1, "/dashboard")}
+          showText={showSidebarText}
+        />
+        <SidebarItem
+          icon={<MdOutlineHome className="text-xl" />}
+          label="Land Records"
+          active={activeSidebarItem === 2}
+          onClick={() => handleSidebarItemClick(2, "/land-records")}
+          showText={showSidebarText}
+        />
+        <SidebarItem
+          icon={<MdShoppingCart className="text-xl" />}
+          label="Buy Land"
+          active={activeSidebarItem === 3}
+          onClick={() => handleSidebarItemClick(3, "/buy-land")}
+          showText={showSidebarText}
+        />
+        <SidebarItem
+          icon={<MdAttachMoney className="text-xl" />}
+          label="Sell Land"
+          active={activeSidebarItem === 4}
+          onClick={() => handleSidebarItemClick(4, "/sell-land")}
+          showText={showSidebarText}
+        />
+        <SidebarItem
+          icon={<MdCompareArrows className="text-xl" />}
+          label="Transfer Ownership"
+          active={activeSidebarItem === 5}
+          onClick={() => handleSidebarItemClick(5, "/transfer-ownership")}
+          showText={showSidebarText}
+        />
       </ul>
       <button
         className={`flex items-center gap-4 text-white-500 p-3 rounded-full  mt-auto w-full justify-center lg:justify-start pl-4 lg:pl-6 transition-all duration-300 ${

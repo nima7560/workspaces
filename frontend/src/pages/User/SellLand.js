@@ -5,26 +5,18 @@ import swal from "sweetalert2";
 
 function SellLand() {
   const navigate = useNavigate();
-
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
-  const [showSidebarText, setShowSidebarText] = useState(
-    window.innerWidth >= 1024
-  );
+  const [showSidebarText, setShowSidebarText] = useState(window.innerWidth >= 1024);
   const [activeSidebarItem, setActiveSidebarItem] = useState(1);
-
-  // New Sell Land form states
   const [landIdToSell, setLandIdToSell] = useState("");
   const [sellPrice, setSellPrice] = useState("");
   const [sellStatus, setSellStatus] = useState("");
+  const [ownerIdentity, setOwnerIdentity] = useState("Admin@govt.tera.bt");
 
-  // User's lands state
-  const [userLands, setUserLands] = useState([]);
-
-  // Handler for listing land for sale
   const handleSellLand = async () => {
-    if (!landIdToSell || !sellPrice) {
-      setSellStatus("Please enter both Land ID and price.");
+    if (!landIdToSell || !sellPrice || !ownerIdentity) {
+      setSellStatus("Please enter Land ID, price, and owner identity.");
       return;
     }
     setSellStatus("Processing...");
@@ -35,7 +27,7 @@ function SellLand() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           price: sellPrice,
-          ownerIdentity: "Admin@buyers.tera.bt",
+          ownerIdentity: ownerIdentity,
         }),
       });
       if (!res.ok) throw new Error("Failed to list land for sale");
@@ -54,36 +46,13 @@ function SellLand() {
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
-  // Fetch user's registered lands on mount
-  useEffect(() => {
-    const fetchUserLands = async () => {
-      const userCid = localStorage.getItem("userCid");
-      try {
-        const response = await fetch(
-          "http://localhost:5000/api/govtland/land-records"
-        );
-        const data = await response.json();
-        // Only lands owned by this user
-        const owned = (data.data || data).filter(
-          (land) => land.cid === userCid
-        );
-        setUserLands(owned);
-      } catch (err) {
-        setUserLands([]);
-      }
-    };
-    fetchUserLands();
-  }, []);
-
   useEffect(() => {
     const handleResize = () => {
       setSidebarOpen(window.innerWidth >= 1024);
       setShowSidebarText(window.innerWidth >= 1024);
     };
-
     window.addEventListener("resize", handleResize);
     handleResize();
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -140,7 +109,7 @@ function SellLand() {
             <input
               type="text"
               className="border rounded px-3 py-2"
-              placeholder="Enter Land ID (CID)"
+              placeholder="Enter Land ID "
               value={landIdToSell}
               onChange={(e) => setLandIdToSell(e.target.value)}
             />
@@ -150,6 +119,13 @@ function SellLand() {
               placeholder="Enter Price"
               value={sellPrice}
               onChange={(e) => setSellPrice(e.target.value)}
+            />
+            <input
+              type="text"
+              className="border rounded px-3 py-2"
+              placeholder="Enter Owner Identity (e.g., Admin@govt.tera.bt)"
+              value={ownerIdentity}
+              onChange={e => setOwnerIdentity(e.target.value)}
             />
             <button
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"

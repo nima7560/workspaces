@@ -83,15 +83,6 @@ const LandRecords = () => {
   const [searchError, setSearchError] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  // Add state for landId to buy and buy status
-  const [landIdToBuy, setLandIdToBuy] = useState("");
-  const [buyStatus, setBuyStatus] = useState("");
-
-  // Add state for landId to sell and sell price/status
-  const [landIdToSell, setLandIdToSell] = useState("");
-  const [sellPrice, setSellPrice] = useState("");
-  const [sellStatus, setSellStatus] = useState("");
-
   useEffect(() => {
     const fetchLands = async () => {
       try {
@@ -339,51 +330,6 @@ const LandRecords = () => {
     }
   };
 
-  // Handler for buying land by ID
-  const handleBuyLand = async () => {
-    if (!landIdToBuy) {
-      setBuyStatus("Please enter a Land ID (CID) to buy.");
-      return;
-    }
-    setBuyStatus("Processing...");
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(`${apiUrl}/lands/${landIdToBuy}/buy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ buyerIdentity: "Admin@buyers.tera.bt" })
-      });
-      if (!res.ok) throw new Error("Failed to buy land");
-      setBuyStatus("Land purchase successful!");
-      setLandIdToBuy("");
-    } catch (error) {
-      setBuyStatus("Failed to buy land. " + error.message);
-    }
-  };
-
-  // Handler for listing land for sale
-  const handleSellLand = async () => {
-    if (!landIdToSell || !sellPrice) {
-      setSellStatus("Please enter both Land ID (CID) and price.");
-      return;
-    }
-    setSellStatus("Processing...");
-    try {
-      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-      const res = await fetch(`${apiUrl}/lands/${landIdToSell}/sell`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price: sellPrice, ownerIdentity: "Admin@govt.tera.bt" })
-      });
-      if (!res.ok) throw new Error("Failed to list land for sale");
-      setSellStatus("Land listed for sale successfully!");
-      setLandIdToSell("");
-      setSellPrice("");
-    } catch (error) {
-      setSellStatus("Failed to list land for sale. " + error.message);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <div className="flex-grow p-4 sm:p-8 pt-16">
@@ -491,7 +437,7 @@ const LandRecords = () => {
                       value={formData.id || formData.cid}
                       onChange={e => setFormData({ ...formData, id: e.target.value, cid: e.target.value })}
                       className="w-full p-2 border rounded"
-                      placeholder="CID Number"
+                      placeholder="Land ID"
                       required
                     />
                     <input
@@ -560,7 +506,7 @@ const LandRecords = () => {
                 className="bg-[#003366] text-white px-4 py-2 rounded-lg text-sm"
                 disabled={searchLoading}
               >
-                {searchLoading ? "Searching..." : "Search by CID"}
+                {searchLoading ? "Searching..." : "Search by ID"}
               </button>
             </div>
           </div>
@@ -568,7 +514,7 @@ const LandRecords = () => {
           {searchedLand && (
             <div className="border rounded p-4 bg-gray-50 mb-4">
               <h3 className="font-semibold mb-2">Land Details</h3>
-              <div><span className="font-medium">CID:</span> {searchedLand.id}</div>
+              <div><span className="font-medium">ID:</span> {searchedLand.id}</div>
               <div><span className="font-medium">Owner:</span> {searchedLand.owner || searchedLand.ownerName}</div>
               <div><span className="font-medium">Location:</span> {searchedLand.location}</div>
               <div><span className="font-medium">Size:</span> {searchedLand.landSize || searchedLand.size}</div>
@@ -918,53 +864,6 @@ const LandRecords = () => {
             </div>
           </div>
         )}
-        {/* Buy Land Section */}
-        <div className="bg-white p-4 rounded shadow mb-6 max-w-md mx-auto">
-          <h2 className="text-lg font-semibold mb-2">Buy Land by Land ID (CID)</h2>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              className="border rounded px-3 py-2 flex-1"
-              placeholder="Enter Land ID (CID)"
-              value={landIdToBuy}
-              onChange={e => setLandIdToBuy(e.target.value)}
-            />
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              onClick={handleBuyLand}
-            >
-              Buy
-            </button>
-          </div>
-          {buyStatus && <div className="text-sm mt-1 text-gray-700">{buyStatus}</div>}
-        </div>
-        {/* Sell Land Section */}
-        <div className="bg-white p-4 rounded shadow mb-6 max-w-md mx-auto">
-          <h2 className="text-lg font-semibold mb-2">List Land for Sale by Land ID (CID)</h2>
-          <div className="flex gap-2 mb-2">
-            <input
-              type="text"
-              className="border rounded px-3 py-2 flex-1"
-              placeholder="Enter Land ID (CID)"
-              value={landIdToSell}
-              onChange={e => setLandIdToSell(e.target.value)}
-            />
-            <input
-              type="number"
-              className="border rounded px-3 py-2 w-32"
-              placeholder="Price"
-              value={sellPrice}
-              onChange={e => setSellPrice(e.target.value)}
-            />
-            <button
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              onClick={handleSellLand}
-            >
-              List for Sale
-            </button>
-          </div>
-          {sellStatus && <div className="text-sm mt-1 text-gray-700">{sellStatus}</div>}
-        </div>
       </div>
     </div>
   );

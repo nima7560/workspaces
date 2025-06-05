@@ -689,28 +689,29 @@ function BuyLand() {
           </button>
         </div> */}
 
-        {/* Buy Land by Land ID (CID) */}
-        <div className="bg-white p-4 rounded shadow mb-6 max-w-md mx-auto">
-          <h2 className="text-lg font-semibold mb-2">
-            Buy Land by Land ID
-          </h2>
-          <div className="flex gap-2 mb-2">
+        {/* Buy Land by ID */}
+        <div className="mb-8 max-w-md mx-auto">
+          <h2 className="text-lg font-semibold mb-2">Buy Land by ID</h2>
+          <div className="flex gap-2">
             <input
               type="text"
-              className="border rounded px-3 py-2 flex-1"
+              className="border border-gray-300 rounded-l px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-800 placeholder-gray-400"
               placeholder="Enter Land ID"
               value={landIdToBuy}
               onChange={(e) => setLandIdToBuy(e.target.value)}
+              aria-label="Land ID"
             />
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-r font-semibold transition w-32 disabled:bg-green-300 disabled:cursor-not-allowed"
               onClick={handleBuyLand}
+              disabled={!landIdToBuy.trim()}
+              aria-label="Buy Land by ID"
             >
               Buy
             </button>
           </div>
           {buyStatus && (
-            <div className="text-sm mt-1 text-gray-700">{buyStatus}</div>
+            <div className={`text-sm mt-2 px-3 py-2 rounded font-medium w-full ${buyStatus.includes('success') ? 'bg-green-100 text-green-700 border border-green-300' : buyStatus.includes('Processing') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-red-100 text-red-700 border border-red-300'}`}>{buyStatus}</div>
           )}
         </div>
       </div>

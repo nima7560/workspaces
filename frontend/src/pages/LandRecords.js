@@ -83,6 +83,15 @@ const LandRecords = () => {
   const [searchError, setSearchError] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
 
+  // Add state for landId to buy and buy status
+  const [landIdToBuy, setLandIdToBuy] = useState("");
+  const [buyStatus, setBuyStatus] = useState("");
+
+  // Add state for landId to sell and sell price/status
+  const [landIdToSell, setLandIdToSell] = useState("");
+  const [sellPrice, setSellPrice] = useState("");
+  const [sellStatus, setSellStatus] = useState("");
+
   useEffect(() => {
     const fetchLands = async () => {
       try {
@@ -243,21 +252,28 @@ const LandRecords = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Only send the fields required by the chaincode: id, location, size, price
+      // Only send the fields required by the chaincode: id, location, size, price, ownerIdentity
       const payload = {
         id: formData.id,
         location: formData.location,
         size: formData.size,
         price: Number(formData.price),
+        ownerIdentity: "Admin@govt.tera.bt"
       };
-      const result = await registerLand(payload);
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${apiUrl}/lands`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Failed to register land");
       Swal.fire({
         icon: "success",
         title: "Success!",
-        text: result.message || "Land registered successfully!",
+        text: "Land registered successfully!",
         confirmButtonColor: "#142854",
       });
-      setRegistrationSuccess(result.message || "Land registered successfully!");
+      setRegistrationSuccess("Land registered successfully!");
       setRegistrationError(null);
       setFormData({ id: "", location: "", size: "", price: "" });
       toggleModal();
@@ -266,15 +282,10 @@ const LandRecords = () => {
       Swal.fire({
         icon: "error",
         title: "Registration Failed",
-        text:
-          error.response?.data?.message ||
-          error.message ||
-          "Land registration failed",
+        text: error.message || "Land registration failed",
         confirmButtonColor: "#003366",
       });
-      setRegistrationError(
-        error.response?.data?.message || error.message || "Land registration failed"
-      );
+      setRegistrationError(error.message || "Land registration failed");
       setRegistrationSuccess(null);
     }
   };
@@ -325,6 +336,51 @@ const LandRecords = () => {
       setSearchError("Land not found for this CID Number.");
     } finally {
       setSearchLoading(false);
+    }
+  };
+
+  // Handler for buying land by ID
+  const handleBuyLand = async () => {
+    if (!landIdToBuy) {
+      setBuyStatus("Please enter a Land ID (CID) to buy.");
+      return;
+    }
+    setBuyStatus("Processing...");
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${apiUrl}/lands/${landIdToBuy}/buy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ buyerIdentity: "Admin@buyers.tera.bt" })
+      });
+      if (!res.ok) throw new Error("Failed to buy land");
+      setBuyStatus("Land purchase successful!");
+      setLandIdToBuy("");
+    } catch (error) {
+      setBuyStatus("Failed to buy land. " + error.message);
+    }
+  };
+
+  // Handler for listing land for sale
+  const handleSellLand = async () => {
+    if (!landIdToSell || !sellPrice) {
+      setSellStatus("Please enter both Land ID (CID) and price.");
+      return;
+    }
+    setSellStatus("Processing...");
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${apiUrl}/lands/${landIdToSell}/sell`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ price: sellPrice, ownerIdentity: "Admin@govt.tera.bt" })
+      });
+      if (!res.ok) throw new Error("Failed to list land for sale");
+      setSellStatus("Land listed for sale successfully!");
+      setLandIdToSell("");
+      setSellPrice("");
+    } catch (error) {
+      setSellStatus("Failed to list land for sale. " + error.message);
     }
   };
 
@@ -862,6 +918,53 @@ const LandRecords = () => {
             </div>
           </div>
         )}
+        {/* Buy Land Section */}
+        <div className="bg-white p-4 rounded shadow mb-6 max-w-md mx-auto">
+          <h2 className="text-lg font-semibold mb-2">Buy Land by Land ID (CID)</h2>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              className="border rounded px-3 py-2 flex-1"
+              placeholder="Enter Land ID (CID)"
+              value={landIdToBuy}
+              onChange={e => setLandIdToBuy(e.target.value)}
+            />
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={handleBuyLand}
+            >
+              Buy
+            </button>
+          </div>
+          {buyStatus && <div className="text-sm mt-1 text-gray-700">{buyStatus}</div>}
+        </div>
+        {/* Sell Land Section */}
+        <div className="bg-white p-4 rounded shadow mb-6 max-w-md mx-auto">
+          <h2 className="text-lg font-semibold mb-2">List Land for Sale by Land ID (CID)</h2>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              className="border rounded px-3 py-2 flex-1"
+              placeholder="Enter Land ID (CID)"
+              value={landIdToSell}
+              onChange={e => setLandIdToSell(e.target.value)}
+            />
+            <input
+              type="number"
+              className="border rounded px-3 py-2 w-32"
+              placeholder="Price"
+              value={sellPrice}
+              onChange={e => setSellPrice(e.target.value)}
+            />
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              onClick={handleSellLand}
+            >
+              List for Sale
+            </button>
+          </div>
+          {sellStatus && <div className="text-sm mt-1 text-gray-700">{sellStatus}</div>}
+        </div>
       </div>
     </div>
   );

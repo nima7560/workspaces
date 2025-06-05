@@ -43,7 +43,6 @@ const Dashboard = () => {
   const [approvedTransactions, setApprovedTransactions] = useState(0);
   const [ongoingDisputes, setOngoingDisputes] = useState(0);
   const [pendingTransactions, setPendingTransactions] = useState(0);
-  const [userLands, setUserLands] = useState([]); // Store user's lands
   const itemsPerPage = 5;
 
   // Get user CID and role from localStorage (set at login)
@@ -60,18 +59,14 @@ const Dashboard = () => {
         let allLands = response.data.data || response.data || [];
         if (userRole === "admin") {
           setRegisteredLands(allLands.length); // Show total for admin
-          setUserLands([]); // No userLands for admin
         } else if (userRole === "user" && userCid) {
           const userLands = allLands.filter((land) => land.cid === userCid);
           setRegisteredLands(userLands.length); // Show user count for user
-          setUserLands(userLands);
         } else {
           setRegisteredLands(0);
-          setUserLands([]);
         }
       } catch (error) {
         setRegisteredLands(0);
-        setUserLands([]);
       }
     };
     fetchLands();
@@ -110,6 +105,28 @@ const Dashboard = () => {
     };
     fetchTransactions();
   }, [userCid, userRole]);
+
+  // Fetch the user's land count from the blockchain using their CID (id)
+  useEffect(() => {
+    const fetchUserLandCount = async () => {
+      try {
+        // Always read the latest CID from localStorage
+        const cid = localStorage.getItem("userCid") || "11309001854";
+        const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+        // Fetch land by CID (id)
+        const res = await fetch(`${apiUrl}/lands/${cid}`);
+        if (!res.ok) throw new Error("No land found for this CID");
+        const land = await res.json();
+        // If a land is found, set count to 1, else 0
+        setRegisteredLands(land && land.id ? 1 : 0);
+      } catch (error) {
+        setRegisteredLands(0);
+      }
+    };
+    if (userRole === "user") {
+      fetchUserLandCount();
+    }
+  }, [userRole]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -747,54 +764,6 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-
-        {/* Registered Land List Section (only for users) */}
-        {userRole === "user" && userLands.length > 0 && (
-          <div className="bg-white shadow-xl rounded-lg p-6 mt-8 overflow-x-auto">
-            <h2 className="font-semibold text-xl text-gray-800 mb-5">
-              My Registered Lands
-            </h2>
-            <table className="min-w-full leading-normal mt-3">
-              <thead>
-                <tr className="bg-gray-100 text-gray-700 uppercase text-sm font-semibold">
-                  <th className="py-3 px-4 text-left border-b border-gray-200">
-                    Location
-                  </th>
-                  <th className="py-3 px-4 text-left border-b border-gray-200">
-                    Thram Number
-                  </th>
-                  <th className="py-3 px-4 text-left border-b border-gray-200">
-                    Size
-                  </th>
-                  <th className="py-3 px-4 text-left border-b border-gray-200">
-                    Type
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {userLands.map((land) => (
-                  <tr
-                    key={land._id}
-                    className="hover:bg-gray-50 transition-colors duration-150"
-                  >
-                    <td className="py-3 px-4 border-b border-gray-200 text-sm">
-                      {land.location}
-                    </td>
-                    <td className="py-3 px-4 border-b border-gray-200 text-sm">
-                      {land.thramNumber}
-                    </td>
-                    <td className="py-3 px-4 border-b border-gray-200 text-sm">
-                      {land.size ? `${land.size} sqm` : "N/A"}
-                    </td>
-                    <td className="py-3 px-4 border-b border-gray-200 text-sm">
-                      {land.type}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
         <div className="mt-4">
           <button

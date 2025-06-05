@@ -2,7 +2,7 @@
   "name": "TeraConsortium",
   "version": "1.0.0",
   "channels": {
-    "terachannel": {
+    "teraconsortiumchannel": {
       "orderers": ["orderer.tera.bt"],
       "peers": {
         "teraconsortium-govt": {},

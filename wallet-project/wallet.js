@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Wallets } = require('fabric-network');
+const { Wallets, Gateway } = require('fabric-network');
 
 const CRYPTO_CONFIG = path.resolve(__dirname, '../config/crypto-config');
 const CRYPTO_CONFIG_PEER_ORGS = path.join(CRYPTO_CONFIG, 'peerOrganizations');
@@ -181,4 +181,33 @@ function createMSPId(org) {
 
 function createIdentityLabel(org, user) {
     return user + '@' + org + '.tera.bt';
+}
+
+async function getContractAs(identityLabel) {
+    const walletPath = path.join(process.cwd(), 'wallet');
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    const identity = await wallet.get(identityLabel);
+
+    if (!identity) {
+        throw new Error(`Identity ${identityLabel} not found in wallet`);
+    }
+
+    const gateway = new Gateway();
+    const connectionProfile = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'connection.json'), 'utf8'));
+    const connectionOptions = { 
+        wallet, 
+        identity: identityLabel, 
+        discovery: { enabled: false, asLocalhost: true } 
+    };
+
+    await gateway.connect(connectionProfile, connectionOptions);
+    const network = await gateway.getNetwork('teraconsortiumchannel');
+    const contract = network.getContract('tera-landregistry');
+    return contract;
+}
+
+async function submitTransactionAs(functionName, identityLabel, ...args) {
+    const contract = await getContractAs(identityLabel);
+    const result = await contract.submitTransaction(functionName, ...args);
+    return result.toString();
 }

@@ -51,8 +51,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Land listing endpoint
 app.post('/lands', async (req, res) => {
   try {
-    const { id, location, size, price } = req.body;
-    const result = await submitTransaction('ListLand', id, location, size, price.toString());
+    const { id, location, size, price, ownerIdentity } = req.body;
+    if (!ownerIdentity) {
+      return res.status(400).send("ownerIdentity is required");
+    }
+    const result = await submitTransactionAs(ownerIdentity, 'ListLand', id, location, size, price.toString());
     res.status(201).send(result);
   } catch (error) {
     console.error(`Failed to list land: ${error}`);
@@ -76,8 +79,11 @@ app.get('/lands/:id', async (req, res) => {
 app.put('/lands/:id/sell', async (req, res) => {
   try {
     const { id } = req.params;
-    const { price } = req.body;
-    const result = await submitTransaction('SellLand', id, price.toString());
+    const { price, ownerIdentity } = req.body;
+    if (!ownerIdentity) {
+      return res.status(400).send("ownerIdentity is required");
+    }
+    const result = await submitTransactionAs(ownerIdentity, 'SellLand', id, price.toString());
     res.status(200).send(result);
   } catch (error) {
     console.error(`Failed to mark land for sale: ${error}`);
@@ -89,7 +95,11 @@ app.put('/lands/:id/sell', async (req, res) => {
 app.post('/lands/:id/buy', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await submitTransaction('BuyLand', id);
+    const { buyerIdentity } = req.body;
+    if (!buyerIdentity) {
+      return res.status(400).send("buyerIdentity is required");
+    }
+    const result = await submitTransactionAs(buyerIdentity, 'BuyLand', id);
     res.status(200).send(result);
   } catch (error) {
     console.error(`Failed to buy land: ${error}`);
@@ -142,6 +152,28 @@ async function getContract() {
 async function submitTransaction(functionName, ...args) {
   const contract = await getContract();
   const result = await contract.submitTransaction(functionName, ...args);
+  return result.toString();
+}
+
+async function submitTransactionAs(identityLabel, functionName, ...args) {
+  const walletPath = path.join(process.cwd(), 'wallet');
+  const wallet = await Wallets.newFileSystemWallet(walletPath);
+  const identity = await wallet.get(identityLabel);
+  if (!identity) {
+    throw new Error(`Identity ${identityLabel} not found in wallet`);
+  }
+  const gateway = new Gateway();
+  const connectionProfile = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'connection.json'), 'utf8'));
+  const connectionOptions = {
+    wallet,
+    identity: identityLabel,
+    discovery: { enabled: false, asLocalhost: true }
+  };
+  await gateway.connect(connectionProfile, connectionOptions);
+  const network = await gateway.getNetwork('teraconsortiumchannel');
+  const contract = network.getContract('tera-landregistry');
+  const result = await contract.submitTransaction(functionName, ...args);
+  await gateway.disconnect();
   return result.toString();
 }
 

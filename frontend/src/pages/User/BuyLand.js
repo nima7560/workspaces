@@ -25,6 +25,10 @@ function BuyLand() {
   const [buyerCid, setBuyerCid] = useState("");
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
+  // Add state for landId to buy
+  const [landIdToBuy, setLandIdToBuy] = useState("");
+  const [buyStatus, setBuyStatus] = useState("");
+
   const isFormValid =
     selectedBank &&
     uploadedImage &&
@@ -158,6 +162,28 @@ function BuyLand() {
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Handler for buying land
+  const handleBuyLand = async () => {
+    if (!landIdToBuy) {
+      setBuyStatus("Please enter a Land ID (CID) to buy.");
+      return;
+    }
+    setBuyStatus("Processing...");
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+      const res = await fetch(`${apiUrl}/lands/${landIdToBuy}/buy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ buyerIdentity: "Admin@buyers.tera.bt" }),
+      });
+      if (!res.ok) throw new Error("Failed to buy land");
+      setBuyStatus("Land purchase successful!");
+      setLandIdToBuy("");
+    } catch (error) {
+      setBuyStatus("Failed to buy land. " + error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex flex-row">
@@ -666,6 +692,31 @@ function BuyLand() {
           >
             Next
           </button>
+        </div>
+
+        {/* Buy Land by Land ID (CID) */}
+        <div className="bg-white p-4 rounded shadow mb-6 max-w-md mx-auto">
+          <h2 className="text-lg font-semibold mb-2">
+            Buy Land by Land ID (CID)
+          </h2>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              className="border rounded px-3 py-2 flex-1"
+              placeholder="Enter Land ID (CID)"
+              value={landIdToBuy}
+              onChange={(e) => setLandIdToBuy(e.target.value)}
+            />
+            <button
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              onClick={handleBuyLand}
+            >
+              Buy
+            </button>
+          </div>
+          {buyStatus && (
+            <div className="text-sm mt-1 text-gray-700">{buyStatus}</div>
+          )}
         </div>
       </div>
     </div>

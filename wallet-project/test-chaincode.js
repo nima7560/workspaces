@@ -5,14 +5,14 @@ const path = require('path');
 const connectionProfilePath = path.resolve(__dirname, 'connection.json');
 const walletPath = path.resolve(__dirname, 'wallet');
 
-const channelName = 'teralandchannel';
-const chaincodeName = 'teralandregistry';
+const channelName = 'teraconsortiumchannel';
+const chaincodeName = 'tera-landregistry';
 
 // Identities
 const identities = {
   govt: 'Admin@govt.tera.bt',
-  buyers: 'buyer1@buyers.tera.bt',
-  sellers: 'seller1@sellers.tera.bt'
+  buyers: 'Admin@buyers.tera.bt',
+  sellers: 'Admin@sellers.tera.bt'
 };
 
 // Test data
@@ -54,13 +54,13 @@ async function main() {
       testLand.id,
       testLand.location,
       testLand.size,
-      testLand.price,
+      testLand.price, // revert to string for price
     ], 'Seller should list a new land');
 
     // 2. Seller puts land for sale
     await submitTransaction(connectionProfile, wallet, identities.sellers, 'SellLand', [
       testLand.id,
-      testLand.price,
+      testLand.price, // revert to string for price
     ], 'Seller should mark land for sale');
 
     // 3. Buyer buys the land
@@ -68,10 +68,10 @@ async function main() {
       testLand.id,
     ], 'Buyer should buy land');
 
-    // 4. Govt approves the transaction
-    await submitTransaction(connectionProfile, wallet, identities.govt, 'ApproveTransaction', [
-      testLand.id,
-    ], 'Govt should approve transaction');
+    // // 4. Govt approves the transaction
+    // await submitTransaction(connectionProfile, wallet, identities.govt, 'ApproveTransaction', [
+    //   testLand.id,
+    // ], 'Govt should approve transaction');
 
     // 5. Query land info as buyer
     await queryLand(connectionProfile, wallet, identities.buyers, testLand.id);

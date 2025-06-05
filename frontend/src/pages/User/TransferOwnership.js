@@ -145,7 +145,7 @@ function TransferOwnership() {
                 </div>
 
                 <div className="bg-gray-50 p-6 sm:p-10">
-                    <h2 className="text-center text-3xl font-semibold text-gray-900 mb-8">List Land for Sale</h2>
+                    <h2 className="text-center text-3xl font-semibold text-gray-900 mb-8">Transfer Ownership</h2>
 
                     {/* New Ownership Details */}
                     <div className="mb-6">

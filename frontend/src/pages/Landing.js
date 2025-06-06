@@ -5,6 +5,36 @@ import heroBanner from "../assets/images/herobanner.jpeg";
 import aboutUs from "../assets/images/aboutuss.jpg";
 import contactUs from "../assets/images/contactus.jpg";
 
+
+// Toast component
+function Toast({ message, type, onClose }) {
+  return (
+    <div className={`fixed bottom-8 right-8 z-50 px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 transition-all duration-300
+      ${type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'} toast-slide-in`}
+      role="alert"
+      style={{ minWidth: '280px', maxWidth: '90vw' }}
+    >
+      <span className="font-semibold text-lg">
+        {type === 'success' ? (
+          <svg className="inline h-6 w-6 mr-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        ) : (
+          <svg className="inline h-6 w-6 mr-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        )}
+      </span>
+      <span className="flex-1 text-base">{message}</span>
+      <button onClick={onClose} className="ml-2 text-white hover:text-gray-200 focus:outline-none">
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -12,6 +42,7 @@ export default function LandingPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   //handle the contact form submission
   const handleSubmit = async (e) => {
@@ -28,18 +59,25 @@ export default function LandingPage() {
 
       const data = await response.json();
       if (response.ok) {
-        alert("Message sent successfully!");
+        setToast({ show: true, message: "Message sent successfully!", type: "success" });
         setName("");
         setEmail("");
         setMessage("");
       } else {
-        alert(data.message || "Something went wrong");
+        setToast({ show: true, message: data.message || "Something went wrong", type: "error" });
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to send message");
+      setToast({ show: true, message: "Failed to send message", type: "error" });
     }
   };
+
+  // Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => setToast({ ...toast, show: false }), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,6 +101,9 @@ export default function LandingPage() {
 
   return (
     <div className="bg-gray-100 min-h-screen">
+      {toast.show && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />
+      )}
       {/* Header */}
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -407,6 +448,16 @@ export default function LandingPage() {
           <p>&copy; 2025 Secure Land Registry. All rights reserved.</p>
         </div>
       </footer>
+      <style jsx global>{`
+  .toast-slide-in {
+    transform: translateX(120%);
+    animation: toast-in 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes toast-in {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+`}</style>
     </div>
   );
 }

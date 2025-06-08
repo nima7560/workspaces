@@ -4,8 +4,23 @@ import React from "react";
 import { AiOutlineDownload } from "react-icons/ai";
 import { FiMenu, FiUser } from "react-icons/fi";
 import axios from "axios";
+import landImage from '../../../src/assets/images/land.jpg';
+import landImage1 from '../../../src/assets/images/land1.png';
+import landImage2 from '../../../src/assets/images/land2.png';
+import landImage3 from '../../../src/assets/images/land3.png';
+import landImage4 from '../../../src/assets/images/land4.png';
+import landImage5 from '../../../src/assets/images/land5.png';
+
 
 function BuyLand() {
+  const plotData = [
+    { name: "Greenfield Plot", location: "Babesa,Thimphu", area: "500 sqm", image: landImage },
+    { name: "Hillside Acres", location: "Olakha,Thimphu", area: "750 sqm", image: landImage1 },
+    { name: "Coastal Retreat", location: "Phuentsholing", area: "620 sqm", image: landImage2 },
+    { name: "Outback Parcel", location: "T/gang", area: "800 sqm", image: landImage3 },
+    { name: "Riverbank Lot", location: "Damphu,Tsirang", area: "450 sqm", image: landImage4 },
+    { name: "Sunny Meadows", location: "Dagana", area: "700 sqm", image: landImage5 },
+  ];
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -25,7 +40,6 @@ function BuyLand() {
   const [buyerCid, setBuyerCid] = useState("");
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
-  // Add state for landId to buy
   const [landIdToBuy, setLandIdToBuy] = useState("");
   const [buyStatus, setBuyStatus] = useState("");
 
@@ -107,10 +121,10 @@ function BuyLand() {
       pageNumber === 1
         ? "/dashboard"
         : pageNumber === 2
-        ? "/transactions"
-        : pageNumber === 3
-        ? "/land-records"
-        : "/land-disputes"
+          ? "/transactions"
+          : pageNumber === 3
+            ? "/land-records"
+            : "/land-disputes"
     );
     if (window.innerWidth < 1024) {
       setSidebarOpen(false);
@@ -137,8 +151,8 @@ function BuyLand() {
         const lands = Array.isArray(response.data.data)
           ? response.data.data
           : Array.isArray(response.data)
-          ? response.data
-          : [];
+            ? response.data
+            : [];
         setAllTransactions(lands);
       } catch (error) {
         console.error("Failed to fetch lands for sale", error);
@@ -184,12 +198,12 @@ function BuyLand() {
     <div className="min-h-screen w-full bg-gray-100 flex flex-row">
       <div className="flex-grow p-4 sm:p-8 pt-16">
         {/* Header for Desktop */}
-        <div className="rounded-lg hidden sm:flex justify-between items-center mb-6 bg-white z-10 shadow-md p-4">
+        <div className="rounded-lg hidden sm:flex justify-between items-center bg-white z-10 shadow-md p-4">
           <div className="flex items-center gap-4 ">
             <button onClick={toggleSidebarMobile} className="lg:hidden mr-4">
               <FiMenu className="text-2xl text-gray-700" />
             </button>
-            <h1 className="font-semibold text-gray-800 ml-5">Sell Land</h1>
+            <h1 className="font-semibold text-gray-800 ml-5">Buy Land</h1>
           </div>
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -276,12 +290,12 @@ function BuyLand() {
                     {selectedTransaction.landSize}
                   </p>
                   {selectedTransaction.registrationDate ||
-                  selectedTransaction.date ? (
+                    selectedTransaction.date ? (
                     <p>
                       <span className="font-semibold">Registration Date:</span>{" "}
                       {new Date(
                         selectedTransaction.registrationDate ||
-                          selectedTransaction.date
+                        selectedTransaction.date
                       ).toLocaleDateString()}
                     </p>
                   ) : null}
@@ -364,7 +378,7 @@ function BuyLand() {
                     </label>
                     <select
                       id="bank-select"
-                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                       value={selectedBank}
                       onChange={(e) => setSelectedBank(e.target.value)}
                     >
@@ -392,7 +406,7 @@ function BuyLand() {
                       type="file"
                       id="image-upload"
                       accept="image/*"
-                      className="block w-full text-gray-700 rounded-md border border-gray-300 px-2 py-1.5 text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="block w-full text-gray-700 rounded-md border border-gray-300 px-2 py-1.5 text-sm cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                       onChange={handleImageChange}
                     />
                     {uploadedImage && (
@@ -424,7 +438,7 @@ function BuyLand() {
                         }
                       }}
                       placeholder="Enter journal number (numbers only)"
-                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                     />
                   </div>
 
@@ -442,7 +456,7 @@ function BuyLand() {
                       value={buyerName}
                       onChange={(e) => setBuyerName(e.target.value)}
                       placeholder="Enter your name"
-                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                     />
                   </div>
                   {/* Buyer CID */}
@@ -459,7 +473,7 @@ function BuyLand() {
                       value={buyerCid}
                       onChange={(e) => setBuyerCid(e.target.value)}
                       placeholder="Enter your CID number"
-                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      className="w-full border border-gray-300 rounded-md px-2 py-1.5 text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                     />
                   </div>
                 </div>
@@ -570,11 +584,10 @@ function BuyLand() {
                       alert("Failed to complete purchase. Please try again.");
                     }
                   }}
-                  className={`px-4 py-2 rounded transition text-white ${
-                    isFormValid
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-green-300 cursor-not-allowed"
-                  }`}
+                  className={`px-4 py-2 rounded transition text-white ${isFormValid
+                    ? "bg-[#003366] hover:bg-[#003366]"
+                    : "bg-[#003366] cursor-not-allowed"
+                    }`}
                   disabled={!isFormValid}
                 >
                   Confirm Purchase
@@ -690,29 +703,62 @@ function BuyLand() {
         </div> */}
 
         {/* Buy Land by ID */}
-        <div className="mb-8 max-w-md mx-auto">
-          <h2 className="text-lg font-semibold mb-2">Buy Land by ID</h2>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              className="border border-gray-300 rounded-l px-4 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-800 placeholder-gray-400"
-              placeholder="Enter Land ID"
-              value={landIdToBuy}
-              onChange={(e) => setLandIdToBuy(e.target.value)}
-              aria-label="Land ID"
-            />
-            <button
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-r font-semibold transition w-32 disabled:bg-green-300 disabled:cursor-not-allowed"
-              onClick={handleBuyLand}
-              disabled={!landIdToBuy.trim()}
-              aria-label="Buy Land by ID"
-            >
-              Buy
-            </button>
+        <div className="row bg-white rounded p-2">
+          <div className="col-md-12 ">
+            <div className="mb-8 max-w-md mx-auto ">
+              <h2 className="text-lg font-semibold mb-2">Buy Land by ID</h2>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  className="border border-gray-300 rounded-l px-4 py-2 flex-1 focus:outline-none focus:ring-1 focus:ring-[#003366] text-gray-800 placeholder-gray-400"
+                  placeholder="Enter Land ID"
+                  value={landIdToBuy}
+                  onChange={(e) => setLandIdToBuy(e.target.value)}
+                  aria-label="Land ID"
+                />
+                <button
+                  className="bg-[#003366] hover:bg-[#003366] text-white px-4 py-2 rounded-r font-semibold transition w-32 disabled:bg-[#003366] disabled:cursor-not-allowed"
+                  onClick={handleBuyLand}
+                  disabled={!landIdToBuy.trim()}
+                  aria-label="Buy Land by ID"
+                >
+                  Buy
+                </button>
+              </div>
+              {buyStatus && (
+                <div className={`text-sm mt-2 px-3 py-2 rounded font-medium w-full ${buyStatus.includes('success') ? 'bg-green-100 text-green-700 border border-green-300' : buyStatus.includes('Processing') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-red-100 text-red-700 border border-red-300'}`}>{buyStatus}</div>
+              )}
+            </div>
           </div>
-          {buyStatus && (
-            <div className={`text-sm mt-2 px-3 py-2 rounded font-medium w-full ${buyStatus.includes('success') ? 'bg-green-100 text-green-700 border border-green-300' : buyStatus.includes('Processing') ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-red-100 text-red-700 border border-red-300'}`}>{buyStatus}</div>
-          )}
+
+          <div className="container mx-auto py-8 bg-white-100 px-4">
+            <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {plotData.map((plot, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white border rounded-lg shadow-lg overflow-hidden flex flex-col"
+                >
+                  <img
+                    src={plot.image}
+                    alt={plot.name}
+                    className="h-44 w-full object-cover"
+                  />
+
+                  <div className="p-4 text-center flex flex-col flex-grow">
+                    <h5 className="text-lg font-semibold mb-1">{plot.name}</h5>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Location: {plot.location}
+                      <br />
+                      Area: {plot.area}
+                    </p>
+                    <button className="mt-auto bg-[#003366] hover:bg-[#002244] text-white font-semibold py-2 rounded w-full">
+                      Buy
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

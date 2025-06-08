@@ -1,0 +1,116 @@
+# Tera Land Registry DApp
+
+A decentralized application (DApp) for managing land records, built with React (frontend) and a Node.js/Express backend, integrated with Hyperledger Fabric for blockchain-based land registration and management.
+
+## Project Structure
+
+```
+.
+├── backend/           # Node.js/Express backend API
+├── frontend/          # React frontend (Create React App)
+├── wallet-project/    # Fabric wallet and network integration
+├── chaincodes/        # Hyperledger Fabric chaincode (smart contracts)
+├── config/            # Network and Fabric configuration files
+├── bin/               # Fabric CLI tools
+├── .devcontainer/     # Dev container configuration for VS Code
+└── ...
+```
+
+## Features
+
+- Register new land records on the blockchain
+- Edit and update land information
+- Search land by CID (Citizen ID)
+- View detailed land and owner information
+- Delete land records (admin only)
+- Responsive UI with modals for registration, editing, and viewing
+- Integration with Hyperledger Fabric for secure, auditable transactions
+
+## Getting Started
+
+### Prerequisites
+
+- [Docker](https://www.docker.com/)
+- [Node.js](https://nodejs.org/) (for local development)
+- [npm](https://www.npmjs.com/)
+- [Git](https://git-scm.com/)
+- Hyperledger Fabric binaries (provided in `bin/`)
+
+### Development Environment
+
+This project is set up for development in a VS Code Dev Container (see [.devcontainer/](.devcontainer/)).
+
+#### 1. Clone the repository
+
+```sh
+git clone <your-repo-url>
+cd <your-repo-directory>
+```
+
+#### 2. Start the Dev Container
+
+Open the project in VS Code and reopen in the dev container when prompted.
+
+#### 3. Install dependencies
+
+- **Backend:**
+  ```sh
+  cd backend
+  npm install
+  ```
+- **Frontend:**
+  ```sh
+  cd ../frontend
+  npm install
+  ```
+
+#### 4. Configure Environment Variables
+
+- Copy `.env.example` to `.env` in both `backend/` and `frontend/` and update as needed.
+
+#### 5. Start the Backend
+
+```sh
+cd backend
+npm start
+```
+
+#### 6. Start the Frontend
+
+```sh
+cd ../frontend
+npm start
+```
+
+The frontend will be available at [http://localhost:3000](http://localhost:3000).
+
+## Usage
+
+- Register new land using the "Register New Land" button.
+- Edit or delete existing land records from the table.
+- Search for land records by CID.
+- View detailed information and documents for each land record.
+
+## Blockchain Integration
+
+- Chaincode (smart contracts) are located in [`chaincodes/`](chaincodes/).
+- Fabric network configuration and scripts are in [`config/`](config/) and [`bin/`](bin/).
+- Use the provided CLI commands in [`cmds.txt`](cmds.txt) for chaincode lifecycle management.
+
+## Scripts
+
+### Frontend
+
+- `npm start` - Start the React development server
+- `npm run build` - Build for production
+
+### Backend
+
+- `npm start` - Start the backend server
+
+## License
+
+This project is licensed under the ISC License.
+
+---
+

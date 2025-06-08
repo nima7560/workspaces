@@ -322,7 +322,7 @@ export default function LandingPage() {
               <strong className="font-semibold">
                 TERA (Transparent Estate Registry & Authentication)
               </strong>{" "}
-              – a blockchain-based land registry system designed for GMC to
+              – a blockchain-based land registry system to
               modernize how land ownership and transactions are recorded,
               verified, and managed.
             </p>

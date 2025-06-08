@@ -101,34 +101,35 @@ function SellLand() {
         </div>
 
         {/* Modern Sell Land Form */}
-        <div className="bg-white p-6 rounded shadow max-w-md mx-auto mt-12">
-          <h2 className="text-xl font-semibold mb-4 text-center">
+        <div className="bg-white p-10 min-h-[65vh]
+ rounded shadow max-w mx-auto mt-12">
+          <h2 className="text-xl font-semibold mb-4">
             List Your Land for Sale
           </h2>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 border rounded p-6">
             <input
               type="text"
-              className="border rounded px-3 py-2"
+              className="border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#003366]"
               placeholder="Enter Land ID "
               value={landIdToSell}
               onChange={(e) => setLandIdToSell(e.target.value)}
             />
             <input
               type="number"
-              className="border rounded px-3 py-2"
+              className="border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#003366]"
               placeholder="Enter Price"
               value={sellPrice}
               onChange={(e) => setSellPrice(e.target.value)}
             />
             <input
               type="text"
-              className="border rounded px-3 py-2"
+              className="border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#003366]"
               placeholder="Enter Owner Identity (e.g., Admin@govt.tera.bt)"
               value={ownerIdentity}
               onChange={e => setOwnerIdentity(e.target.value)}
             />
             <button
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              className="bg-[#003366] text-white px-4 py-2 rounded hover:bg-[#003366]"
               onClick={handleSellLand}
             >
               List for Sale
@@ -138,6 +139,7 @@ function SellLand() {
             )}
           </div>
         </div>
+
       </div>
     </div>
   );

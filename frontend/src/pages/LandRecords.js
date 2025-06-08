@@ -24,6 +24,14 @@ import { AiOutlineEye, AiOutlineDownload } from "react-icons/ai"; // For downloa
 import Swal from "sweetalert2";
 import { registerLand, getGovtLands } from "../services/authService";
 
+// Utility function to compress hash
+const compressHash = (hash) => {
+  if (!hash) return "";
+  return hash.length > 15
+    ? `${hash.slice(0, 6)}...${hash.slice(-4)}`
+    : hash;
+};
+
 const LandRecords = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -515,7 +523,9 @@ const LandRecords = () => {
             <div className="border rounded p-4 bg-gray-50 mb-4">
               <h3 className="font-semibold mb-2">Land Details</h3>
               <div><span className="font-medium">ID:</span> {searchedLand.id}</div>
-              <div><span className="font-medium">Owner:</span> {searchedLand.owner || searchedLand.ownerName}</div>
+              <div>
+                <span className="font-medium">Owner:</span> {compressHash(searchedLand.owner || searchedLand.ownerName)}
+              </div>
               <div><span className="font-medium">Location:</span> {searchedLand.location}</div>
               <div><span className="font-medium">Size:</span> {searchedLand.landSize || searchedLand.size}</div>
               <div><span className="font-medium">Price:</span> {searchedLand.price}</div>
